@@ -1,0 +1,1 @@
+ALTER TABLE "manga" ADD COLUMN "cover_color" varchar(7) NOT NULL;

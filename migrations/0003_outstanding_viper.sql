@@ -1,0 +1,1 @@
+ALTER TABLE "reactions" ADD COLUMN "season_title" text;

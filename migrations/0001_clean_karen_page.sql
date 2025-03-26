@@ -1,0 +1,1 @@
+ALTER TABLE "series" ALTER COLUMN "tmdb_id" DROP NOT NULL;

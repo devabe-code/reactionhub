@@ -1,0 +1,60 @@
+[{
+  "_id": {
+    "$oid": "6696c3e9b6fb646d2a108a33"
+  },
+  "episode": "Episode 1",
+  "title": "WHAT DID I JUST WATCH???",
+  "first-link": "https://streamable.com/1rait9",
+  "second-link": "https://drive.google.com/file/d/1EeB6AdP2UhUVXnLW6w_B6-_Afc_s5WYk/view?usp=share_link",
+  "thumbnail": "https://i.imgur.com/3zUC9Dv.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c1683bce6b3cb0c48b5d6"
+  },
+  "episode": "Episode 2",
+  "title": "WHAT IS THAT?!",
+  "first-link": "https://streamable.com/a78c04",
+  "second-link": "https://drive.google.com/file/d/1pkKNDYJJ19zsAYzwBxHWusF7ygsyLs_f/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/ipyqm7V.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c16c7bce6b3cb0c48b5d7"
+  },
+  "episode": "Episode 3",
+  "title": "TRAINING BEGINS!!!",
+  "first-link": "https://streamable.com/rh7jju",
+  "second-link": "https://drive.google.com/file/d/1Z5euQ-0OF9FXdFNXTZMFoQl2QpxHDndL/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/lXucfcN.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c16e2bce6b3cb0c48b5d8"
+  },
+  "episode": "Episode 4",
+  "title": "COLOSSAL TITAN ROUND 2???",
+  "first-link": "https://streamable.com/ctk79e",
+  "second-link": "https://drive.google.com/file/d/1R1iO7INF-A_5xROaFo_Xp98TTgV6_B8P/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/Tn6z5rJ.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c170bbce6b3cb0c48b5d9"
+  },
+  "episode": "Episode 5",
+  "title": "DID EREN JUST GET...",
+  "first-link": "https://streamable.com/zg59bo",
+  "second-link": "https://drive.google.com/file/d/1K03uwjX0UBZxxwF_0_Qlf_8p0SoUyYUY/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/kMglQrP.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c1728bce6b3cb0c48b5da"
+  },
+  "episode": "Episode 6",
+  "title": "THE ORIGIN OF MIKASA!!",
+  "first-link": "https://streamable.com/wjj77z",
+  "second-link": "https://drive.google.com/file/d/1XItcWeONcKaoyziGxmCW_8hKTgOVIZP4/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/mBn6zde.jpg"
+}]

@@ -1,0 +1,80 @@
+[{
+  "_id": {
+    "$oid": "6696c413b6fb646d2a108a34"
+  },
+  "episode": "Episode 1",
+  "title": "Introductions",
+  "first-link": "https://streamable.com/54cakx",
+  "second-link": "https://drive.google.com/file/d/1wdifOemHw2SnCc9X4lcD_2Ybt-QFM7mP/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/Gs7JzJl.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0e88bce6b3cb0c48b5b3"
+  },
+  "episode": "Episode 2",
+  "title": "Lost",
+  "first-link": "https://streamable.com/19dh7b",
+  "second-link": "https://drive.google.com/file/d/1D1ogN4SQ9n2Qna1m0PiHKtFYekyPpv3T/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/Wnj8w3N.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0e9fbce6b3cb0c48b5b4"
+  },
+  "episode": "Episode 3",
+  "title": "Perspective",
+  "first-link": "https://streamable.com/ppdszw",
+  "second-link": "https://drive.google.com/file/d/1kG4LnD8VQ-z9oK4IgVLMs5t5E4UZiz3p/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/DMfvdqD.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0ebebce6b3cb0c48b5b5"
+  },
+  "episode": "Episode 4",
+  "title": "Take It Easy",
+  "first-link": "https://streamable.com/nmopii",
+  "second-link": "https://drive.google.com/file/d/1hP8VVQZzf15vLXn04e-yIGg0uk18V2UK/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/1X3DyjG.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0ed2bce6b3cb0c48b5b6"
+  },
+  "episode": "Episode 5",
+  "title": "Fame",
+  "first-link": "https://streamable.com/eaclw1",
+  "second-link": "https://drive.google.com/file/d/1HQa1qM0tHMMBHcxyKJ30s3Ltapxs8bIk/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/h5H3GQk.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0ef3bce6b3cb0c48b5b7"
+  },
+  "episode": "Episode 6",
+  "title": "Enhancements",
+  "first-link": "https://streamable.com/1qji9q",
+  "second-link": "https://drive.google.com/file/d/1rd7NLgOiLNcnYp7BRgqMJpe8tI_myNI0/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/HdiTgdT.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0f0bbce6b3cb0c48b5b8"
+  },
+  "episode": "Episode 7",
+  "title": "Return",
+  "first-link": "https://streamable.com/lsgia7",
+  "second-link": "https://drive.google.com/file/d/1UxRdHYbhWu2-sJ0x7FkiMso2vdTd7ITe/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/mEcDhqc.jpg"
+},
+{
+  "_id": {
+    "$oid": "669c0f26bce6b3cb0c48b5b9"
+  },
+  "episode": "Episode 8-25",
+  "title": "18 EPISODE SPECIAL!",
+  "first-link": "https://streamable.com/6g9u4p",
+  "second-link": "https://drive.google.com/file/d/19cZg-kfYIaeYT9SKdMtndHByFPyhKv75/view?usp=drive_link",
+  "thumbnail": "https://i.imgur.com/XfzD80e.jpg"
+}]
