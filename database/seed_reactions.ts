@@ -51,17 +51,24 @@ const SEASON_NAME_MAP: Record<string, number> = {
   "s4": 4,
   "s5": 5,
   // Add One Piece arc mappings
-  "east_blue": 1,
-  "alabasta": 2,
-  "skypiea": 3,
-  "water_7": 4,
-  "thriller_bark": 5,
-  "summit_war": 6,
-  "fishman_island": 7,
-  "dressrosa": 8,
-  "whole_cake_island": 9,
-  "wano": 10,
-  "egghead": 11,
+  "alabasta": 4,
+  "skypiea": 5, // spans 5 & 6, assign to first season
+  "water_7": 7, // spans 7, 8, 9
+  "thriller_bark": 10,
+  "summit_war": 11, // spans 11, 12, 13
+  "fishman_island": 15,
+  "punk_hazard": 16,
+  "dressrosa": 17,
+  "zou": 18,
+  "whole_cake": 19,
+  "reverie": 20,
+  "wano": 21,
+
+  // Optional aliases for flexibility
+  "water7": 7,
+  "whole_cake_island": 19,
+  "wano_country": 21,
+
   // Add Hunter x Hunter arc mappings
   "hunter_exam": 1,
   "zoldyck_family": 1,
@@ -98,9 +105,11 @@ const ARC_EPISODE_RANGES: Record<string, Record<string, [number, number]>> = {
     "fishman_island": [517, 574],
     "punk_hazard": [575, 628],
     "dressrosa": [629, 746],
-    "whole_cake_island": [747, 877],
-    "wano": [878, 1085],
-    "egghead": [1086, 1100], // Approximate, update as needed
+    "zou": [747, 782],
+    "whole_cake_island": [783, 877],
+    "reverie": [878, 889],
+    "wano": [890, 1085],
+    "egghead": [1086, 1122], // Approximate, update as needed
   },
   "hunter_x_hunter": {
     "hunter_exam": [1, 21],

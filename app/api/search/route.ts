@@ -3,11 +3,11 @@ import { db } from "@/database/drizzle"
 import { movies, series, seasons, episodes, reactions } from "@/database/schema"
 import { sql, eq, or, ilike, and } from "drizzle-orm"
 
-// Replace the type definition for SearchResultItem with this more precise one
+// Update the SearchResultItem type to include manga and title_synonyms
 type SearchResultItem = {
   id: string
   title: string
-  type: "movie" | "series" | "anime" | "season" | "episode" | "reaction"
+  type: "movie" | "series" | "anime" | "manga" | "season" | "episode" | "reaction"
   poster_path?: string | null
   year?: string | null
   // Optional fields that may exist on some types but not others
@@ -15,6 +15,7 @@ type SearchResultItem = {
   description?: string | null
   backdrop_path?: string | null
   genres?: any
+  title_synonyms?: any
   parent_title?: string | null
   series_id?: string | null
   season_id?: string | null
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
       )
       .limit(limit)
 
-    // Search anime with enhanced data
+    // Enhanced search for anime with title_synonyms support
     const animeResults = await db
       .select({
         id: series.id,
@@ -135,6 +136,46 @@ export async function GET(request: NextRequest) {
         number_of_episodes: series.number_of_episodes,
         genres: series.genres,
         type: sql<"anime">`'anime'`.as("type"),
+        year: sql`EXTRACT(YEAR FROM ${series.first_air_date})::text`,
+        has_reaction: sql<boolean>`EXISTS (
+          SELECT 1 FROM reactions 
+          WHERE reactions.series_id = ${series.id}
+        )`.as("has_reaction"),
+        reaction_count: sql<number>`(
+          SELECT COUNT(*) FROM reactions 
+          WHERE reactions.series_id = ${series.id}
+        )`.as("reaction_count"),
+      })
+      .from(series)
+      .where(
+        and(
+          eq(series.is_anime, true),
+          or(
+            ilike(series.title, searchPattern),
+            ilike(series.original_title, searchPattern),
+            ilike(series.description, searchPattern),
+            // Search in genres (JSONB array)
+            sql`${series.genres}::text ILIKE ${searchPattern}`,
+          ),
+        ),
+      )
+      .limit(limit)
+
+    // Enhanced manga search with title_synonyms support
+    const mangaResults = await db
+      .select({
+        id: series.id,
+        title: series.title,
+        original_title: series.original_title,
+        description: series.description,
+        poster_path: series.poster_path,
+        backdrop_path: series.backdrop_path,
+        first_air_date: series.first_air_date,
+        last_air_date: series.last_air_date,
+        number_of_seasons: series.number_of_seasons,
+        number_of_episodes: series.number_of_episodes,
+        genres: series.genres,
+        type: sql<"manga">`'manga'`.as("type"),
         year: sql`EXTRACT(YEAR FROM ${series.first_air_date})::text`,
         has_reaction: sql<boolean>`EXISTS (
           SELECT 1 FROM reactions 
@@ -244,7 +285,7 @@ export async function GET(request: NextRequest) {
       )
       .limit(limit)
 
-    // Search directly in reactions
+    // Enhanced reactions search
     const reactionResults = await db
       .select({
         id: reactions.id,
@@ -287,15 +328,35 @@ export async function GET(request: NextRequest) {
           ilike(reactions.title, searchPattern),
           ilike(reactions.episode, searchPattern),
           ilike(reactions.season_title, searchPattern),
+          // Join with series to search by anime title or synonyms
+          sql`EXISTS (
+            SELECT 1 FROM series 
+            WHERE series.id = ${reactions.series_id} 
+            AND (
+              ${ilike(series.title, searchPattern)} 
+              OR ${ilike(series.original_title, searchPattern)}
+            )
+          )`,
+          // Search for anime + episode/season pattern
+          sql`EXISTS (
+            SELECT 1 FROM series 
+            WHERE series.id = ${reactions.series_id} 
+            AND series.is_anime = true
+            AND (
+              (${ilike(series.title, searchPattern)} AND ${reactions.episode} IS NOT NULL)
+              OR (${ilike(series.title, searchPattern)} AND ${reactions.season_title} IS NOT NULL)
+            )
+          )`,
         ),
       )
       .limit(limit)
 
-    // Replace the line where combinedResults is defined with this explicit type casting
+    // Update combined results to include manga
     let combinedResults: SearchResultItem[] = [
       ...movieResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
       ...seriesResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
       ...animeResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
+      ...mangaResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
       ...seasonResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
       ...episodeResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
       ...reactionResults.map((item) => ({ ...item, year: item.year?.toString() || null })),
@@ -352,8 +413,8 @@ export async function GET(request: NextRequest) {
       }
 
       // Then prioritize main content types over episodes/seasons
-      const aMainContent = ["movie", "series", "anime"].includes(a.type)
-      const bMainContent = ["movie", "series", "anime"].includes(b.type)
+      const aMainContent = ["movie", "series", "anime", "manga"].includes(a.type)
+      const bMainContent = ["movie", "series", "anime", "manga"].includes(b.type)
 
       if (aMainContent && !bMainContent) return -1
       if (!aMainContent && bMainContent) return 1

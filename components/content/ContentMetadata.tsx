@@ -4,12 +4,13 @@ import { Calendar, Clock, Globe, Users, TrendingUp, Award } from "lucide-react"
 import type { ContentMetadataProps } from "@/lib/types"
 
 // Helper function to parse JSON if needed
-const parseJsonField = (field: any) => {
+const parseJsonField = (field: string) => {
   if (!field) return []
   if (typeof field === "string") {
     try {
       return JSON.parse(field)
-    } catch (e) {
+    } catch (e: unknown) {
+      console.log(e)
       return []
     }
   }

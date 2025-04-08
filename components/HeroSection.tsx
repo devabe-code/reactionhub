@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Info } from "lucide-react"
@@ -11,13 +10,21 @@ import { cn } from "@/lib/utils"
 import { FaPlay, FaYoutube } from "react-icons/fa6"
 import { get_reaction } from "@/lib/actions/reactions"
 import type { ReactionParams } from "@/lib/types"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import Autoplay, { type AutoplayType } from "embla-carousel-autoplay"
 
 // Define base content interface with required fields
 export interface BaseContent {
   id: string
   title: string
   image?: string
-  [key: string]: any // Allow any additional fields
+  [key: string]: string | number | boolean | undefined | null
 }
 
 // Define content that can be featured in the hero
@@ -42,20 +49,10 @@ export interface HeroSectionProps {
   className?: string
 }
 
+const TMDB_URL = "https://image.tmdb.org/t/p/original"
+
 // HeroSlide component to handle individual slides
-const HeroSlide = ({
-  content,
-  isActive,
-  isDragging,
-  dragDelta,
-  TMDB_URL,
-}: {
-  content: FeaturedContent
-  isActive: boolean
-  isDragging: boolean
-  dragDelta: number
-  TMDB_URL: string
-}) => {
+const HeroSlide = ({ content }: { content: FeaturedContent }) => {
   const [reactionData, setReactionData] = useState<ReactionParams | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [imageSrc, setImageSrc] = useState("/placeholder.svg?height=1080&width=1920")
@@ -105,16 +102,11 @@ const HeroSlide = ({
     updateImage()
     window.addEventListener("resize", updateImage)
     return () => window.removeEventListener("resize", updateImage)
-  }, [reactionData, TMDB_URL])
+  }, [reactionData])
 
   if (isLoading) {
     return (
-      <div
-        className={cn(
-          "absolute inset-0 w-full h-full flex items-center justify-center",
-          isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-        )}
-      >
+      <div className="flex items-center justify-center h-full">
         <div className="animate-pulse w-8 h-8 rounded-full bg-white/20"></div>
       </div>
     )
@@ -124,34 +116,27 @@ const HeroSlide = ({
     return null
   }
 
-  console.log(imageSrc)
-
   return (
-    <div
-      className={cn(
-        "absolute inset-0 w-full h-full transition-opacity duration-500 flex justify-center items-center ",
-        isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-      )}
-    >
-      {/* Dynamically selected image */}
+    <div className="relative h-[80vh] md:h-[85vh] lg:h-[90vh] overflow-hidden w-full">
+      {/* Background Image */}
       <Image
         src={imageSrc}
         alt={content.title}
         fill
-        priority={isActive}
+        priority
         className="object-cover"
       />
 
       {/* Gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-background/40 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-60 bg-gradient-to-t from-background via-background/100 to-transparent" />
 
       {/* Content */}
       <div className="relative z-20 h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl">
+        <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row gap-8 items-center bg-black/30 rounded-2xl p-4">
-            {/* Thumbnail with styling */}
+            {/* Thumbnail */}
             <div className="relative rounded-md overflow-hidden shadow-2xl border border-white/10 w-full md:w-[560px] aspect-video">
               <Image
                 src={reactionData.thumbnail || "/placeholder.svg?height=1080&width=1920"}
@@ -162,14 +147,13 @@ const HeroSlide = ({
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div className="absolute bottom-3 left-3 flex items-center gap-2">
                 <FaYoutube className="text-red-500" size={24} />
-                <span className="text-white text-sm font-medium">Reaction</span>
+                <span className="text-white text-sm font-medium">Full Reaction</span>
               </div>
             </div>
 
             {/* Content details */}
             <div className="flex-1 md:mt-0">
               <div className="flex flex-col items-center">
-                {/* Content Type Badge */}
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="outline" className="bg-red-600/20 text-red-500 border-red-500">
                     <FaYoutube size={12} className="mr-1" /> Reaction Available
@@ -178,8 +162,8 @@ const HeroSlide = ({
 
                 <h1 className="text-xl text-center md:text-2xl lg:text-3xl font-bold mb-1">{reactionData.title}</h1>
                 <h3 className="text-md text-center md:text-xl lg:text-2xl font-medium">
-                  {reactionData.anime?.title_english} Episode {reactionData.episode?.episode_number}
-                  </h3>
+                  {reactionData.anime?.title_english} {reactionData.episode?.episode_number && `Episode ${reactionData.episode.episode_number}`}
+                </h3>
 
                 <div className="flex flex-wrap items-center gap-3 mb-3 text-sm">
                   <span>
@@ -189,24 +173,25 @@ const HeroSlide = ({
                   </span>
                 </div>
                 <span className="text-center hidden lg:block">
-                    {reactionData.series?.description?.slice(0,250)}...
-                  </span>
+                  {reactionData.series?.description?.slice(0,250)}...
+                </span>
 
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-center gap-3 mt-4">
                   <Link href={`/reactions/${reactionData.id}`}>
                     <Button
                       variant="default"
-                      color="red"
-                      className="gap-2"
+                      className="gap-2 bg-red-600 hover:bg-red-700 text-white"
                     >
                       <FaPlay size={18} />
                       Watch Reaction
                     </Button>
                   </Link>
-                  <Button variant="outline" className="gap-2">
-                    <Info size={18} />
-                    More Info
-                  </Button>
+                  <Link href={`/series/${reactionData.series?.id}/season/${reactionData.season_number}/episode/${reactionData.episode?.episode_number}`}>
+                    <Button variant="outline" className="gap-2">
+                      <Info size={18} />
+                      More Info
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -217,164 +202,54 @@ const HeroSlide = ({
   )
 }
 
-
 export default function HeroSection({
   featuredContent = [],
-  upcomingContent = [],
-  title = "Coming This Week",
   className,
 }: HeroSectionProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStartX, setDragStartX] = useState(0)
-  const [dragDelta, setDragDelta] = useState(0)
-  const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const heroRef = useRef<HTMLDivElement>(null)
-
-  const TMDB_URL = "https://image.tmdb.org/t/p/original"
+  // Create a ref for the autoplay plugin first, before any conditionals
+  const plugin = useRef<AutoplayType>(
+    Autoplay({ 
+      delay: 10000, 
+      stopOnInteraction: true,
+      stopOnMouseEnter: true,
+    })
+  )
 
   // Handle empty content
   if (featuredContent.length === 0) {
     return null
   }
 
-  // Function to go to next slide
-  const goToNextSlideBase = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % featuredContent.length)
-  }
-
-  const goToPrevSlideBase = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? featuredContent.length - 1 : prevIndex - 1))
-  }
-
-  const goToNextSlide = useCallback(() => {
-    setIsTransitioning(true)
-    goToNextSlideBase()
-
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false)
-    }, 500)
-  }, [goToNextSlideBase])
-
-  // Function to go to previous slide
-  const goToPrevSlide = useCallback(() => {
-    setIsTransitioning(true)
-    goToPrevSlideBase()
-
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false)
-    }, 500)
-  }, [goToPrevSlideBase])
-
-  // Setup autoplay
-  const startAutoplay = useCallback(() => {
-    if (autoplayTimerRef.current) {
-      clearTimeout(autoplayTimerRef.current)
-    }
-
-    autoplayTimerRef.current = setTimeout(() => {
-      goToNextSlide()
-    }, 8000)
-  }, [goToNextSlide])
-
-  const stopAutoplay = useCallback(() => {
-    if (autoplayTimerRef.current) {
-      clearTimeout(autoplayTimerRef.current)
-      autoplayTimerRef.current = null
-    }
-  }, [])
-
-  // Handle autoplay
-  useEffect(() => {
-    startAutoplay()
-
-    return () => {
-      stopAutoplay()
-    }
-  }, [currentIndex, startAutoplay, stopAutoplay])
-
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        stopAutoplay()
-        goToPrevSlide()
-        startAutoplay()
-      } else if (e.key === "ArrowRight") {
-        stopAutoplay()
-        goToNextSlide()
-        startAutoplay()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [goToNextSlide, goToPrevSlide, startAutoplay, stopAutoplay])
-
-  // Handle drag functionality
-  const handleDragStart = useCallback(
-    (e: React.MouseEvent | React.TouchEvent) => {
-      stopAutoplay()
-      setIsDragging(true)
-
-      // Get the starting position
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
-
-      setDragStartX(clientX)
-      setDragDelta(0)
-    },
-    [stopAutoplay],
-  )
-
   return (
     <section
-      ref={heroRef}
       className={cn(
         "relative w-full h-[80vh] md:h-[85vh] lg:h-[90vh] overflow-hidden",
         className,
       )}
-      onMouseDown={handleDragStart}
-      onTouchStart={handleDragStart}
     >
-      {/* Background Images */}
-      {featuredContent.map((content, index) => (
-        <HeroSlide
-          key={content.id}
-          content={content}
-          isActive={currentIndex === index}
-          isDragging={isDragging}
-          dragDelta={dragDelta}
-          TMDB_URL={TMDB_URL}
-        />
-      ))}
-
-      {/* Indicators */}
-      {featuredContent.length > 1 && (
-        <div className="absolute bottom-20 left-0 right-0 z-20 flex justify-center gap-2">
-          {featuredContent.map((_, i) => (
-            <Button
-              key={i}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
-                currentIndex === i ? "w-6 bg-white" : "w-2 bg-white/50",
-              )}
-              onClick={() => {
-                stopAutoplay()
-                setIsTransitioning(true)
-                setCurrentIndex(i)
-                setTimeout(() => {
-                  setIsTransitioning(false)
-                }, 500)
-                startAutoplay()
-              }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
+      <Carousel
+        opts={{
+          loop: true,
+          align: "start",
+        }}
+        plugins={[plugin.current]}
+        className="w-full h-full"
+      >
+        <CarouselContent className="h-full">
+          {featuredContent.map((content) => (
+            <CarouselItem key={content.id} className="h-full">
+              <HeroSlide content={content} />
+            </CarouselItem>
           ))}
-        </div>
-      )}
+        </CarouselContent>
+        
+        {featuredContent.length > 1 && (
+          <>
+            <CarouselPrevious className="left-4 bg-black/30 hover:bg-black/50 border-none" />
+            <CarouselNext className="right-4 bg-black/30 hover:bg-black/50 border-none" />
+          </>
+        )}
+      </Carousel>
     </section>
   )
 }

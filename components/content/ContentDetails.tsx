@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Play, Calendar, Clock, Star, Tv2, ChevronRight, ChevronDown, ChevronUp } from "lucide-react"
+import {  Clock, Star, Tv2, ChevronRight, ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,7 +14,7 @@ import EpisodeList from "./EpisodeList"
 import SeasonList from "./SeasonList"
 import ReactionList from "./ReactionList"
 import ContentMetadata from "./ContentMetadata"
-import type { ContentDetailsProps } from "@/lib/types"
+import type { ContentDetailsProps, Series } from "@/lib/types"
 
 const TMDB_URL = "https://image.tmdb.org/t/p/original"
 
@@ -22,28 +22,19 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
   const [activeTab, setActiveTab] = useState("overview")
   const [expandedDescription, setExpandedDescription] = useState(false)
 
-  // Helper function to format date
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "Unknown"
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-  }
-
   // Helper function to parse JSON if needed
-  const parseJsonField = (field: any) => {
+  const parseJsonField = (field: unknown) => {
     if (!field) return []
     if (typeof field === "string") {
       try {
         return JSON.parse(field)
-      } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_e) {
         return []
       }
     }
     return field
   }
-
-  // Extract genres
-  const genres = parseJsonField(content.genres)
 
   // Determine if content has reactions
   const hasReactions = relatedContent.reactions && relatedContent.reactions.length > 0
@@ -173,7 +164,7 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
 
                   {/* Genres */}
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {content.genres?.map((genre: any, index: number) => (
+                      {content.genres?.map((genre: { id: number, name: string } | string, index: number) => (
                         <Badge
                           key={index}
                           variant="outline"
@@ -234,12 +225,6 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
                         </Button>
                       </Link>
                     )}
-
-                    {/* Trailer Button */}
-                    <Button variant="outline" className="gap-2">
-                      <FaYoutube size={18} />
-                      Trailer
-                    </Button>
                   </div>
 
                   {/* Featured Reactions Preview */}
@@ -270,9 +255,6 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <FaYoutube size={48} className="text-red-500" />
-                              </div>
                             </div>
                             <div className="p-3">
                               <h4 className="font-medium line-clamp-1">{reaction.title}</h4>
@@ -291,7 +273,7 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
             {(type === "series" || type === "anime") && (
               <TabsContent value="seasons" className="p-6">
                 <SeasonList
-                  series={content as any}
+                  series={content as Series}
                   seasons={relatedContent.seasons || []}
                   reactions={relatedContent.reactions || []}
                 />
@@ -302,7 +284,7 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
             {(type === "series" || type === "anime") && relatedContent.episodes && (
               <TabsContent value="episodes" className="p-6">
                 <EpisodeList
-                  series={content as any}
+                  series={content as Series}
                   episodes={relatedContent.episodes || []}
                   seasons={relatedContent.seasons || []}
                   reactions={relatedContent.reactions || []}
@@ -423,7 +405,7 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
                         <div className="mb-4">
                           <h3 className="text-sm text-gray-400 mb-2">Studios</h3>
                           <div className="flex flex-wrap gap-2">
-                            {parseJsonField(relatedContent.animeData.studios).map((studio: any, index: number) => (
+                            {parseJsonField(relatedContent.animeData.studios).map((studio: {name: string}, index: number) => (
                               <Badge key={index} className="bg-gray-800 hover:bg-gray-700 text-white">
                                 {studio.name}
                               </Badge>
@@ -436,7 +418,7 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
                         <div>
                           <h3 className="text-sm text-gray-400 mb-2">Producers</h3>
                           <div className="flex flex-wrap gap-2">
-                            {parseJsonField(relatedContent.animeData.producers).map((producer: any, index: number) => (
+                            {parseJsonField(relatedContent.animeData.producers).map((producer: {name: string}, index: number) => (
                               <Badge key={index} variant="outline" className="border-gray-700 text-gray-300">
                                 {producer.name}
                               </Badge>

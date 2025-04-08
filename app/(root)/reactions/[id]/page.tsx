@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { db } from "@/database/drizzle"
 import { reactions, series, seasons, episodes } from "@/database/schema"
-import { eq } from "drizzle-orm"
+import { eq, and } from "drizzle-orm"
 import ReactionDetails from "@/components/content/ReactionDetails"
 
 type ReactionParams = {
@@ -66,14 +66,31 @@ export default async function ReactionPage({ params }: ReactionParams) {
       }
     }
 
-    // Fetch other reactions for the same series
+    // Fetch other reactions for the same series and season
+    // Only fetch reactions with a unique title
     if (reaction.series_id) {
       const otherReactionsData = await db
         .select()
         .from(reactions)
-        .where(eq(reactions.series_id, reaction.series_id))
+        .where(
+          reaction.season_id 
+            ? and(eq(reactions.series_id, reaction.series_id), eq(reactions.season_id, reaction.season_id))
+            : eq(reactions.series_id, reaction.series_id)
+        )
       
-      relatedContent.otherReactions = otherReactionsData.filter(r => r.id !== reaction.id)
+      // Create a map to track unique titles
+      const uniqueTitlesMap = new Map<string, typeof reactions.$inferSelect>()
+      
+      // Filter out the current reaction and keep only unique titles
+      otherReactionsData
+        .filter(r => r.id !== reaction.id)
+        .forEach(r => {
+          if (!uniqueTitlesMap.has(r.title)) {
+            uniqueTitlesMap.set(r.title, r)
+          }
+        })
+      
+      relatedContent.otherReactions = Array.from(uniqueTitlesMap.values())
     } else {
       relatedContent.otherReactions = []
     }

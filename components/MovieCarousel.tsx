@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Bell, ChevronLeft, ChevronRight, Youtube } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
@@ -12,8 +11,6 @@ import { get_reaction } from "@/lib/actions/reactions"
 import type { BaseContent } from "@/components/HeroSection"
 import type { ReactionParams } from "@/lib/types"
 import { FaYoutube } from "react-icons/fa6"
-
-const TMDB_URL = "https://image.tmdb.org/t/p/original"
 
 export interface CarouselItemProps extends BaseContent {
   type?: "movie" | "series" | "anime" | "episode"
@@ -31,7 +28,6 @@ interface MovieCarouselProps {
 }
 
 export default function MovieCarousel({ items = [], className, title }: MovieCarouselProps) {
-  const [reminders, setReminders] = useState<Record<string, boolean>>({})
   const [carouselData, setCarouselData] = useState<(ReactionParams | null)[]>([])
   const [api, setApi] = useState<CarouselApi>()
   const [canScrollPrev, setCanScrollPrev] = useState(false)
@@ -60,16 +56,6 @@ export default function MovieCarousel({ items = [], className, title }: MovieCar
 
   useEffect(() => {
     if (items.length > 0) {
-      // Set initial reminders
-      const initialReminders = items.reduce(
-        (acc, item) => ({
-          ...acc,
-          [item.id]: item.reminderSet || false,
-        }),
-        {},
-      )
-      setReminders(initialReminders)
-
       // Fetch reaction data for each item
       const fetchReactions = async () => {
         const fetchedData = await Promise.all(
@@ -94,11 +80,16 @@ export default function MovieCarousel({ items = [], className, title }: MovieCar
     return null
   }
 
-  const toggleReminder = (id: string) => {
-    setReminders((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
+  // Build an array of unique carousel items (skip duplicates based on reaction.title)
+  const uniqueCarouselItems: { reaction: ReactionParams; item: CarouselItemProps }[] = []
+  const seenTitles = new Set<string>()
+  for (let i = 0; i < carouselData.length; i++) {
+    const reaction = carouselData[i]
+    const item = items[i]
+    if (reaction && !seenTitles.has(reaction.title)) {
+      uniqueCarouselItems.push({ reaction, item })
+      seenTitles.add(reaction.title)
+    }
   }
 
   return (
@@ -134,33 +125,30 @@ export default function MovieCarousel({ items = [], className, title }: MovieCar
           className={cn("w-full", className)}
         >
           <CarouselContent className="pb-4 gap-4">
-            {carouselData.map((reaction, index) => {
-              const item = items[index]
-              if (!reaction) return null
-
-              return (
-                <CarouselItem
-                  key={item.id}
-                  className="pl-4 first:ml-4 last:mr-4 basis-[320px] sm:basis-[360px] md:basis-[400px]"
-                >
+            {uniqueCarouselItems.map(({ reaction, item }) => (
+              <CarouselItem
+                key={item.id}
+                className="pl-4 first:ml-4 last:mr-4 basis-[320px] sm:basis-[360px] md:basis-[400px]"
+              >
+                <Link href={`/reactions/${reaction.id}`}>
                   <div className="relative group">
-                      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-md shadow-lg">
-                        <Image
-                          src={reaction.thumbnail || "/placeholder.svg"}
-                          alt={reaction.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative w-full aspect-[16/9] overflow-hidden rounded-md shadow-lg">
+                      <Image
+                        src={reaction.thumbnail || "/placeholder.svg"}
+                        alt={reaction.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                        {/* Reaction Badge */}
-                        <div className="absolute top-2 right-2">
-                          <Badge className="bg-red-600 text-white border-0 flex items-center gap-1 px-1.5 py-0.5">
-                            <FaYoutube size={10} />
-                            <span className="text-[10px]">Reaction</span>
-                          </Badge>
-                        </div>
+                      {/* Reaction Badge */}
+                      <div className="absolute top-2 right-2">
+                        <Badge className="bg-red-600 text-white border-0 flex items-center gap-1 px-1.5 py-0.5">
+                          <FaYoutube size={10} />
+                          <span className="text-[10px]">Reaction</span>
+                        </Badge>
                       </div>
+                    </div>
 
                     {/* Title Overlay */}
                     <div className="absolute inset-0 flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -169,9 +157,9 @@ export default function MovieCarousel({ items = [], className, title }: MovieCar
                       </div>
                     </div>
                   </div>
-                </CarouselItem>
-              )
-            })}
+                </Link>
+              </CarouselItem>
+            ))}
           </CarouselContent>
         </Carousel>
 
@@ -195,4 +183,3 @@ export default function MovieCarousel({ items = [], className, title }: MovieCar
     </div>
   )
 }
-

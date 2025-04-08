@@ -12,6 +12,8 @@ import type { SeasonListProps } from "@/lib/types"
 const TMDB_URL = "https://image.tmdb.org/t/p/w300"
 
 export default function SeasonList({ series, seasons, reactions }: SeasonListProps) {
+  console.log(series)
+  console.log("seasons")
   const [expandedSeason, setExpandedSeason] = useState<string | null>(null)
 
   // Check if a season has reactions

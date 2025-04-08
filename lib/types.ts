@@ -1,3 +1,4 @@
+/* Database Data Types*/
 export interface User {
     id: string;
     name?: string;
@@ -53,28 +54,16 @@ export interface User {
     poster_path?: string;
     backdrop_path?: string;
     coverColor: string;
-    genres?: any;
-    production_companies?: any;
+    genres?: string[];
+    production_companies?: string[];
     tmdb_id: number;
   }
   
-  export interface Series {
-    id: string;
-    title: string;
-    original_title?: string | null;
-    description: string;
+  export interface Series extends BaseContent {
     first_air_date?: Date;
     last_air_date?: Date;
-    number_of_seasons?: number;
-    number_of_episodes?: number;
-    language?: string;
-    poster_path?: string;
-    backdrop_path?: string;
-    genres?: any;
-    coverColor: string;
-    production_companies?: any;
-    tmdb_id: number;
-    is_anime?: boolean;
+    number_of_seasons: number | undefined; // Changed from optional to required but possibly undefined
+    number_of_episodes: number | undefined; // Changed to match BaseContent's requirement
   }
   
   export interface Season {
@@ -105,7 +94,7 @@ export interface User {
     mal_id: number;
     title_japanese?: string;
     title_english?: string;
-    title_synonyms?: any;
+    title_synonyms?: string[];
     status?: string;
     episodes?: number;
     duration?: string;
@@ -120,15 +109,8 @@ export interface User {
     synopsis?: string;
     background?: string;
     premiered?: string;
-    broadcast?: string;
-    producers?: any;
-    licensors?: any;
-    studios?: any;
-    genres?: any;
-    explicit_genres?: any;
-    themes?: any;
-    demographics?: any;
-    images?: any;
+    broadcast?: string[];
+    genres?: string[];
   }
 
   export type ReactionParams = {
@@ -150,7 +132,8 @@ export interface User {
     anime: Anime | null; 
   };
   
-  
+
+/* API Data Types */
 export interface TMDbSeriesData {
   id: number
   name: string
@@ -256,6 +239,9 @@ export type ContentType = "movie" | "series" | "anime" | "season" | "episode";
 
 // Base content interface with common properties
 export interface BaseContent {
+  runtime?: number; // Changed from boolean to optional number
+  number_of_seasons: number | undefined;
+  number_of_episodes: number | undefined;
   id: string;
   title?: string;
   name?: string;
@@ -264,16 +250,19 @@ export interface BaseContent {
   poster_path?: string;
   backdrop_path?: string;
   original_title?: string | null;
-  genres?: string[] | any[];
+  genres?: string[];
   language?: string;
-  production_companies?: string | any[];
-  [key: string]: any; // Allow for additional properties
+  production_companies?: string[];
+  coverColor: string;
+  tmdb_id?: number;
+  mal_id?: number;
+  is_anime?: boolean;
 }
 
 // Movie specific properties
 export interface Movie extends BaseContent {
+  // Removed duplicate runtime property
   release_date?: Date;
-  runtime?: number;
   budget?: number;
   revenue?: number;
 }
@@ -282,8 +271,8 @@ export interface Movie extends BaseContent {
 export interface Series extends BaseContent {
   first_air_date?: Date;
   last_air_date?: Date;
-  number_of_seasons?: number;
-  number_of_episodes?: number;
+  number_of_seasons: number | undefined; // Changed from optional to required but possibly undefined
+  number_of_episodes: number | undefined; // Changed to match BaseContent's requirement
 }
 
 // Season specific properties
@@ -332,8 +321,8 @@ export interface AnimeData {
   popularity?: number;
   members?: number;
   favorites?: number;
-  studios?: string | any[];
-  producers?: string | any[];
+  studios?: string[];
+  producers?: string[];
 }
 
 // Related content interface
@@ -410,6 +399,7 @@ export interface TMDBMovie {
   popularity?: number;
   vote_average?: number;
   vote_count?: number;
-  genres?: any[];
-  production_companies?: any[];
+  genres?: string[];
+  production_companies?: string[];
 }
+

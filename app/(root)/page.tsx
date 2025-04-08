@@ -59,7 +59,7 @@ export default async function Home() {
         <HeroSection featuredContent={heroReactions} upcomingContent={heroReactions} />
       </div>
 
-      <div className="relative bottom-25 md:m-4">
+      <div className="relative bottom-15 md:m-4">
         <MovieCarousel items={heroReactions} title="Continue Watching" />
       </div>
 

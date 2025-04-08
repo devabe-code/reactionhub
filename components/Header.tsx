@@ -2,17 +2,46 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { Bell, Menu, Sidebar, X } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { SidebarTrigger } from "./ui/sidebar"
 import { SearchBar } from "./SearchBar"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
+
+const animeIDs = [
+  {
+    name: "One Piece",
+    id: "3eeccef1-f436-4ea0-8969-1b0b5af91f1a"
+  },
+  {
+    name: "Naruto",
+    id: "fde1c25d-a870-428f-a6ac-ec93fe6d98ce"
+  },
+  {
+    name: "Attack on Titan",
+    id: "fb5b5bc4-faf0-474a-b20a-5f3a04113883"
+  },
+  {
+    name: "Death Note",
+    id: "8cb77d43-ce62-44a6-a1ac-8d92ac02ac0a"
+  },
+  {
+    name: "Hunter x Hunter",
+    id: "1f6d1380-686b-465d-b864-5ef20c8c8e09"
+  },
+  {
+    name: "Haikyuu!!",
+    id: "bd3b33a5-9b3e-4215-9795-099d579fdb36"
+  },
+  {
+    name: "Cowboy Bebop",
+    id: "1bbdd5cd-1a54-43d2-b9f4-22e2beedbc88"
+  }
+]
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Track scroll position to apply blur effect
   useEffect(() => {
@@ -30,7 +59,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 md:left-10 right-0 z-50 md:z-60 flex h-16 shrink-0 items-center gap-2 transition-[width, height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 duration-300 ease-in-out",
+        "sticky top-0 left-0 md:left-10 right-0 z-50 md:z-60 flex h-16 shrink-0 items-center gap-2 transition-[width, height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 duration-300 ease-in-out",
         scrolled ? "bg-black/70 backdrop-blur-lg" : "bg-black/70",
       )}
     >
@@ -53,19 +82,19 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="ml-8 hidden md:flex space-x-6">
-            <Link href="/" className="text-sm font-medium text-white hover:text-white/80 transition-colors">
+          <Link href={`/anime/${animeIDs[0].id}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               One Piece
             </Link>
-            <Link href="/series" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+            <Link href={`/anime/${animeIDs[1].id}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               Naruto
             </Link>
-            <Link href="/movies" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+            <Link href={`/anime/${animeIDs[2].id}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               Attack on Titan
             </Link>
-            <Link href="/new" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+            <Link href={`/anime/${animeIDs[3].id}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               Death Note
             </Link>
-            <Link href="/mylist" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+            <Link href="/list" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               My List
             </Link>
           </nav>

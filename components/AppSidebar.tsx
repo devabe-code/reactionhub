@@ -1,61 +1,31 @@
 "use client"
 
 import type * as React from "react"
-import { Film, HistoryIcon, Home, Link, PlayCircle, RewindIcon, Settings2, Star, Tv2 } from "lucide-react"
+import { Film, HistoryIcon, Settings2, Star, Tv2 } from "lucide-react"
 
-import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
-import { NavMain } from "./ui/nav-main"
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenuButton, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
 import { ProfileSwitcher } from "./ui/profile-switcher"
 import { Session } from "next-auth"
 import { SearchBar } from "./SearchBar"
-import { motion } from "framer-motion"
+import { FaUserNinja } from "react-icons/fa6"
+import Link from "next/link"
 
 // Sample navigation data
 const navItems = [
   {
-    title: "Home",
-    url: "/",
-    icon: Home,
-    isActive: true,
-    items: [],
+    title: "Anime",
+    url: "/anime",
+    icon: FaUserNinja,
   },
   {
     title: "Movies",
     url: "/movies",
-    icon: Film,
-    items: [
-      {
-        title: "Popular",
-        url: "/movies/popular",
-      },
-      {
-        title: "Top Rated",
-        url: "/movies/top-rated",
-      },
-      {
-        title: "Upcoming",
-        url: "/movies/upcoming",
-      },
-    ],
+    icon: Film
   },
   {
     title: "TV Shows",
-    url: "/tv",
-    icon: Tv2,
-    items: [
-      {
-        title: "Popular",
-        url: "/tv/popular",
-      },
-      {
-        title: "Top Rated",
-        url: "/tv/top-rated",
-      },
-      {
-        title: "On Air",
-        url: "/tv/on-air",
-      },
-    ],
+    url: "/tv-shows",
+    icon: Tv2
   },
   {
     title: "My List",
@@ -71,20 +41,6 @@ const navItems = [
     title: "Settings",
     url: "/settings",
     icon: Settings2,
-    items: [
-      {
-        title: "Account",
-        url: "/settings/account",
-      },
-      {
-        title: "Preferences",
-        url: "/settings/preferences",
-      },
-      {
-        title: "Notifications",
-        url: "/settings/notifications",
-      },
-    ],
   },
 ]
 
@@ -107,7 +63,17 @@ export default function AppSidebar({
         <ProfileSwitcher session={session!} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} />
+        {/* Main Navigation */}
+        {navItems.map((item) => (
+          <div key={item.title} className="ml-2">
+              <Link href={item.url}>
+                <SidebarMenuButton tooltip={item.title} className="hover:cursor-pointer">
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                </SidebarMenuButton>
+              </Link>
+          </div>
+        ))}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
