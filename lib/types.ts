@@ -51,19 +51,19 @@ export interface User {
     budget?: number;
     revenue?: number;
     language?: string;
-    poster_path?: string;
-    backdrop_path?: string;
+    poster_path?: string | null;
+    backdrop_path?: string | null;
     coverColor: string;
-    genres?: string[];
+    genres?: string[] | null[];
     production_companies?: string[];
     tmdb_id: number;
   }
   
   export interface Series extends BaseContent {
-    first_air_date?: Date;
-    last_air_date?: Date;
-    number_of_seasons: number | undefined; // Changed from optional to required but possibly undefined
-    number_of_episodes: number | undefined; // Changed to match BaseContent's requirement
+    first_air_date?: Date | string| null;
+    last_air_date?: Date | string | null;
+    number_of_seasons: number | null;
+    number_of_episodes: number | null;
   }
   
   export interface Season {
@@ -110,7 +110,7 @@ export interface User {
     background?: string;
     premiered?: string;
     broadcast?: string[];
-    genres?: string[];
+    genres?: string[] | null[];
   }
 
   export type ReactionParams = {
@@ -144,8 +144,8 @@ export interface TMDbSeriesData {
   number_of_seasons?: number
   number_of_episodes?: number
   original_language?: string
-  poster_path?: string
-  backdrop_path?: string
+  poster_path?: string | null
+  backdrop_path?: string | null
   genres?: Array<{ id: number; name: string }>
   production_companies?: Array<{ id: number; name: string; logo_path?: string; origin_country?: string }>
   seasons?: Array<TMDbSeasonData>
@@ -181,8 +181,8 @@ export interface TMDbMovieData {
   budget?: number
   revenue?: number
   original_language?: string
-  poster_path?: string
-  backdrop_path?: string
+  poster_path?: string | null
+  backdrop_path?: string | null
   genres?: Array<{ id: number; name: string }>
   production_companies?: Array<{ id: number; name: string; logo_path?: string; origin_country?: string }>
 }
@@ -240,23 +240,23 @@ export type ContentType = "movie" | "series" | "anime" | "season" | "episode";
 // Base content interface with common properties
 export interface BaseContent {
   runtime?: number; // Changed from boolean to optional number
-  number_of_seasons: number | undefined;
-  number_of_episodes: number | undefined;
+  number_of_seasons: number | null;
+  number_of_episodes: number | null;
   id: string;
   title?: string;
   name?: string;
   description: string | null;
   overview?: string;
-  poster_path?: string;
-  backdrop_path?: string;
+  poster_path?: string | null;
+  backdrop_path?: string | null;
   original_title?: string | null;
-  genres?: string[];
-  language?: string;
-  production_companies?: string[];
+  genres?: string[] | null[];
+  language?: string | null;
+  production_companies?: string[] | unknown;
   coverColor: string;
-  tmdb_id?: number;
+  tmdb_id?: number | null;
   mal_id?: number;
-  is_anime?: boolean;
+  is_anime?: boolean | null;
 }
 
 // Movie specific properties
@@ -269,10 +269,10 @@ export interface Movie extends BaseContent {
 
 // Series specific properties
 export interface Series extends BaseContent {
-  first_air_date?: Date;
-  last_air_date?: Date;
-  number_of_seasons: number | undefined; // Changed from optional to required but possibly undefined
-  number_of_episodes: number | undefined; // Changed to match BaseContent's requirement
+  first_air_date?: Date | string | null;
+  last_air_date?: Date | string | null;
+  number_of_seasons: number | null; 
+  number_of_episodes: number | null; 
 }
 
 // Season specific properties
@@ -291,19 +291,16 @@ export interface Episode extends BaseContent {
 }
 
 export type Reaction = {
-  id: string
-  title: string
-  createdAt: Date
-  updatedAt: Date
-  series_id: string | null
-  season_id: string | null
-  episode_id: string | null
-  season_number: number
-  season_title: string | null
-  first_link: string
-  second_link: string
-  thumbnail: string
-  episode: string
+  id: string;
+  title: string;
+  episode?: string;
+  thumbnail: string;
+  createdAt: Date;
+  episode_id?: string;
+  season_id?: string;
+  first_link?: string;
+  progress?: number;
+  duration?: number;
 }
 
 
@@ -394,7 +391,7 @@ export interface TMDBMovie {
   original_language?: string;
   status?: string;
   poster_path?: string;
-  backdrop_path?: string;
+  backdrop_path?: string | null;
   imdb_id?: string;
   popularity?: number;
   vote_average?: number;
@@ -403,3 +400,39 @@ export interface TMDBMovie {
   production_companies?: string[];
 }
 
+export interface WatchHistory {
+  id: string;
+  userId: string;
+  reactionId: string;
+  timestamp: number;
+  completed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserList {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserListItem {
+  id: string;
+  listId: string;
+  seriesId?: string;
+  animeId?: string;
+  createdAt: Date;
+}
+
+export interface UserNotification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  relatedId?: string;
+  createdAt: Date;
+}

@@ -30,3 +30,17 @@ export function normalizeNulls<T extends Record<string, any>>(obj: T): T {
 
   return result
 }
+
+export function mapReactionToFeaturedContent(reaction: any) {
+  return {
+    id: reaction.id,
+    title: reaction.title,
+    subtitle: reaction.episode || reaction.season_title,
+    thumbnail: reaction.thumbnail,
+    type: reaction.episode_id ? "episode" : reaction.season_id ? "season" : "reaction",
+    primaryLink: `/reactions/${reaction.id}`,
+    externalLink: reaction.first_link,
+    progress: reaction.progress,
+    duration: reaction.duration
+  };
+}

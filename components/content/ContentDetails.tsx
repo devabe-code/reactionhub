@@ -14,11 +14,18 @@ import EpisodeList from "./EpisodeList"
 import SeasonList from "./SeasonList"
 import ReactionList from "./ReactionList"
 import ContentMetadata from "./ContentMetadata"
-import type { ContentDetailsProps, Series } from "@/lib/types"
+import type { BaseContent, ContentDetailsProps, ContentType, RelatedContent, Series } from "@/lib/types"
+import { VideoCard } from "../ui/video-card"
+import { Session } from "next-auth"
 
 const TMDB_URL = "https://image.tmdb.org/t/p/original"
 
-export default function ContentDetails({ type, content, relatedContent }: ContentDetailsProps) {
+export default function ContentDetails({ type, content, relatedContent, session }: 
+                                        { type: ContentType; 
+                                          content: BaseContent; 
+                                          relatedContent: RelatedContent; 
+                                          session: Session }
+) {
   const [activeTab, setActiveTab] = useState("overview")
   const [expandedDescription, setExpandedDescription] = useState(false)
 
@@ -61,16 +68,18 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
 
       {/* Content Body */}
       <div className="container mx-auto px-4 py-8 -mt-10 relative z-10">
-        <div className="bg-black/80 backdrop-blur-md rounded-xl border border-gray-800 overflow-hidden">
+        <div className="bg-black/80 backdrop-blur-md rounded-xl border border-gray-800 ">
           {/* Tabs Navigation */}
           <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="border-b border-gray-800 px-4">
+            <div className="border-b border-gray-800 px-4 rounded-xl overflow-x-scroll md:overflow-hidden">
               <TabsList className="bg-transparent h-14">
                 {availableTabs.map((tab) => (
                   <TabsTrigger
                     key={tab}
                     value={tab}
-                    className="data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-red-600 rounded-none px-4 py-3 text-gray-400 hover:text-white transition-colors"
+                    className="data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:border-b-2 
+                              data-[state=active]:border-red-600 px-4 py-3 text-gray-400 
+                              hover:text-white transition-colors rounded-xl"
                   >
                     {tab === "overview"
                       ? "Overview"
@@ -164,13 +173,9 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
 
                   {/* Genres */}
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {content.genres?.map((genre: { id: number, name: string } | string, index: number) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 border-gray-700"
-                        >
-                          {typeof genre === "string" ? genre : genre.name}
+                      {content.genres && content.genres.map((genre, i) => (
+                        <Badge key={i} variant="outline" className="border-gray-700 text-gray-300">
+                          <span>{genre}</span>
                         </Badge>
                       ))}
                     </div>
@@ -243,24 +248,25 @@ export default function ContentDetails({ type, content, relatedContent }: Conten
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {relatedContent.reactions!.slice(0, 4).map((reaction) => (
-                          <Link
+                          <VideoCard
                             key={reaction.id}
-                            href={`/reactions/${reaction.id}`}
-                            className="group relative rounded-lg overflow-hidden border border-gray-800 hover:border-gray-700 transition-colors"
+                            id={reaction.id}
+                            title={reaction.title}
+                            subtitle={reaction.episode}
+                            thumbnail={reaction.thumbnail}
+                            date={reaction.createdAt}
+                            type="reaction"
+                            primaryLink={`/reactions/${reaction.id}`}
+                            externalLink={reaction.first_link}
+                            showBadge={true}
+                            showDate={true}
+                            showButtons={true}
+                            progress={reaction.progress}
+                            duration={reaction.duration}
+                            session={session}
                           >
-                            <div className="relative aspect-video">
-                              <Image
-                                src={reaction.thumbnail || "/placeholder.svg?height=180&width=320"}
-                                alt={reaction.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            </div>
-                            <div className="p-3">
-                              <h4 className="font-medium line-clamp-1">{reaction.title}</h4>
-                              <p className="text-sm text-gray-400 line-clamp-1">{reaction.episode}</p>
-                            </div>
-                          </Link>
+
+                          </VideoCard>
                         ))}
                       </div>
                     </div>

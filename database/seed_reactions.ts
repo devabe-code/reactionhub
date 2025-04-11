@@ -11,6 +11,9 @@ import {
   anime
 } from "./schema";
 import { config } from "dotenv";
+import { getVideoDuration } from "../lib/utils/video";
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Load environment variables
 config({ path: ".env.local" });
@@ -517,6 +520,14 @@ async function processReactionsForSeason(
       }
 
       try {
+        // Get video duration from Streamable with more detailed logging
+        console.log(`Fetching duration for reaction: "${title}"`);
+        const duration = await getReactionDuration(firstLink);
+        console.log(`Duration result for "${title}": ${duration !== undefined ? duration + 's' : 'null'}`);
+
+        // Add a longer delay between API calls to avoid rate limiting
+        await sleep(2000);
+
         // Insert the reaction record
         await db.insert(reactions).values({
           series_id: seriesId,
@@ -529,6 +540,7 @@ async function processReactionsForSeason(
           first_link: firstLink,
           second_link: secondLink,
           thumbnail: thumbnail,
+          duration: duration
         });
 
         console.log(`✅ Added reaction: "${title}" for ${seriesTitle} S${episodeSeason.seasonNumber} E${episodeNumber}`);
@@ -536,6 +548,95 @@ async function processReactionsForSeason(
         console.error(`❌ Error inserting reaction for ${seriesTitle} S${episodeSeason.seasonNumber} E${episodeNumber}:`, error);
       }
     }
+  }
+}
+
+// Enhanced function to get reaction duration with better error handling and debugging
+async function getReactionDuration(link: string): Promise<number | undefined> {
+  if (!link.includes("streamable.com")) {
+    console.log(`Skipping duration fetch for non-Streamable link: ${link}`);
+    return undefined;
+  }
+
+  try {
+    console.log(`Fetching duration for: ${link}`);
+    const segments = link.split("/");
+    const videoId = segments[segments.length - 1];
+    
+    // Make sure we have a valid video ID
+    if (!videoId || videoId.length < 5) {
+      console.warn(`Invalid Streamable video ID from link: ${link}`);
+      return undefined;
+    }
+    
+    // Add a delay to avoid rate limiting
+    await sleep(1500);
+    
+    const res = await fetch(`https://api.streamable.com/videos/${videoId}`, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'ReactionHub/1.0'
+      }
+    });
+    
+    if (!res.ok) {
+      console.error(`Error fetching Streamable video: ${res.status} ${res.statusText}`);
+      
+      // If rate limited, wait longer and retry once
+      if (res.status === 429) {
+        console.log("Rate limited, waiting 5 seconds and retrying...");
+        await sleep(5000);
+        
+        const retryRes = await fetch(`https://api.streamable.com/videos/${videoId}`, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'ReactionHub/1.0'
+          }
+        });
+        
+        if (!retryRes.ok) {
+          console.error(`Retry failed: ${retryRes.status} ${retryRes.statusText}`);
+          return undefined;
+        }
+        
+        const retryData = await retryRes.json();
+        console.log("Retry response:", JSON.stringify(retryData).substring(0, 200) + "...");
+        
+        // Check different possible paths for duration in the API response
+        const duration = retryData?.files?.mp4?.duration || 
+                         retryData?.duration ||
+                         retryData?.length;
+                         
+        if (duration) {
+          console.log(`Found duration on retry: ${duration}s`);
+          return Math.round(duration);
+        }
+        
+        return undefined;
+      }
+      
+      return undefined;
+    }
+    
+    const data = await res.json();
+    console.log("API response structure:", JSON.stringify(data).substring(0, 200) + "...");
+    
+    // Try multiple possible paths for duration in the API response
+    const duration = data?.files?.mp4?.duration || 
+                     data?.duration ||
+                     data?.length;
+    
+    if (duration) {
+      console.log(`Found duration: ${duration}s for ${videoId}`);
+      return Math.round(duration);
+    } else {
+      console.warn(`No duration found in API response for ${videoId}`);
+      console.log("Full response:", JSON.stringify(data));
+      return undefined;
+    }
+  } catch (error) {
+    console.error("Error getting video duration:", error);
+    return undefined;
   }
 }
 

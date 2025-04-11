@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronDown, Calendar, Youtube, Play } from "lucide-react"
+import { ChevronDown, Calendar, Youtube, Play, InfoIcon, PlayIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn, formatDate } from "@/lib/utils"
@@ -40,7 +40,7 @@ export default function EpisodeList({ series, episodes, seasons, reactions }: Ep
       {/* Season Selector */}
       {seasons.length > 1 && (
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-0 items-center justify-between mb-2">
             <h2 className="text-2xl font-bold">Episodes</h2>
 
             <div className="relative">
@@ -149,27 +149,27 @@ export default function EpisodeList({ series, episodes, seasons, reactions }: Ep
                   {episode.description && <p className="text-sm text-gray-300 mb-4">{episode.description}</p>}
 
                   <div className="flex flex-wrap gap-3">
-                    <Button size="sm" className="gap-2">
-                      <Play size={16} className="fill-white" />
-                      Watch Now
+                  <Button variant='default'>
+                      {episodeHasReactions(episode.id) && (
+                        <Link
+                          href={`/reactions/${getEpisodeReactions(episode.id)[0]?.id || ""}`}
+                          className="inline-flex items-center gap-1 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          <PlayIcon size={16} />
+                          Watch Reaction
+                        </Link>
+                      )}
                     </Button>
 
-                    <Link
-                      href={`/series/${series.id}/season/${activeSeason}/episode/${episode.episode_number}`}
-                      className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
-                    >
-                      Episode Details
-                    </Link>
-
-                    {episodeHasReactions(episode.id) && (
+                    <Button variant='outline'>
                       <Link
-                        href={`/reactions/${getEpisodeReactions(episode.id)[0]?.id || ""}`}
-                        className="inline-flex items-center gap-1 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+                        href={`/series/${series.id}/season/${activeSeason}/episode/${episode.episode_number}`}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
                       >
-                        <Youtube size={16} />
-                        Watch Reaction
+                        <InfoIcon size={16} />
+                        Episode Details
                       </Link>
-                    )}
+                    </Button>
                   </div>
                 </div>
               )}

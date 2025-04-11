@@ -11,6 +11,7 @@ import React from 'react'
 import { ReactNode } from 'react'
 import AppSidebar from '@/components/AppSidebar';
 import Footer from '@/components/Footer';
+import { SessionProvider } from 'next-auth/react';
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
@@ -33,20 +34,22 @@ const Layout = async ({ children }: { children: ReactNode }) => {
   })
       */
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SessionProvider session={session}>
+      <SidebarProvider defaultOpen={false}>
         <AppSidebar session={session!} />
         <SidebarInset>
-            <main className="">
-                <div className="pb-20">
-                    <Header />
-                    <div className=''>
-                        {children}
-                    </div>
-                    <Footer />
-                </div>
-            </main>
+          <main className="">
+            <div className="pb-20">
+              <Header />
+              <div className=''>
+                {children}
+              </div>
+              <Footer />
+            </div>
+          </main>
         </SidebarInset>
-    </SidebarProvider>
+      </SidebarProvider>
+    </SessionProvider>
   );
 }
 

@@ -242,13 +242,6 @@ export default function HeroSection({
             </CarouselItem>
           ))}
         </CarouselContent>
-        
-        {featuredContent.length > 1 && (
-          <>
-            <CarouselPrevious className="left-4 bg-black/30 hover:bg-black/50 border-none" />
-            <CarouselNext className="right-4 bg-black/30 hover:bg-black/50 border-none" />
-          </>
-        )}
       </Carousel>
     </section>
   )

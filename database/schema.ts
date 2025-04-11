@@ -230,20 +230,59 @@ export const episodes = pgTable("episodes", {
 });
 
 // Reactions table
-export const reactions = pgTable('reactions', {
-  id: text("id")
-  .primaryKey()
-  .$defaultFn(() => crypto.randomUUID()),
-  series_id: text('series_id').references(() => series.id),
-  season_id: text('season_id').references(() => seasons.id),
-  episode_id: text('episode_id').references(() => episodes.id),
-  season_number: integer('season_number').notNull(),
-  season_title: text('season_title'),
-  episode: text('episode').notNull(),
-  title: text('title').notNull(),
-  first_link: text('first_link').notNull(),
-  second_link: text('second_link').notNull(),
-  thumbnail: text('thumbnail').notNull(),
+export const reactions = pgTable("reactions", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  series_id: text("series_id").references(() => series.id),
+  season_id: text("season_id").references(() => seasons.id),
+  episode_id: text("episode_id").references(() => episodes.id),
+  season_number: integer("season_number").notNull(),
+  season_title: text("season_title"),
+  episode: text("episode").notNull(),
+  title: text("title").notNull(),
+  first_link: text("first_link").notNull(),
+  second_link: text("second_link").notNull(),
+  thumbnail: text("thumbnail").notNull(),
+  duration: integer("duration"), // Store video duration in seconds
   createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updatedAt", { withTimezone: true }).defaultNow(),
+});
+
+// User Watch History
+export const watchHistory = pgTable("watch_history", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  reactionId: text("reactionId").notNull().references(() => reactions.id, { onDelete: "cascade" }),
+  timestamp: integer("timestamp").notNull().default(0), // Store video progress in seconds
+  completed: boolean("completed").notNull().default(false),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).defaultNow(),
+});
+
+// User Lists/Favorites
+export const userLists = pgTable("user_lists", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // e.g., "Favorites", "Watch Later", etc.
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).defaultNow(),
+});
+
+export const userListItems = pgTable("user_list_items", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  listId: text("listId").notNull().references(() => userLists.id, { onDelete: "cascade" }),
+  seriesId: text("seriesId").references(() => series.id, { onDelete: "cascade" }),
+  animeId: text("animeId").references(() => anime.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
+});
+
+// User Notifications
+export const userNotifications = pgTable("user_notifications", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // e.g., "new_reaction", "new_episode"
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  relatedId: text("relatedId"), // ID of related content (reaction, series, etc.)
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
 });

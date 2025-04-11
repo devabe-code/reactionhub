@@ -8,10 +8,14 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn, formatDate } from "@/lib/utils"
 import { FaGoogleDrive, FaYoutube } from "react-icons/fa6"
-import type { ReactionDetailsProps } from "@/lib/types"
+import type { ReactionDetailsProps, ReactionParams } from "@/lib/types"
 import VideoPlayer from "@/components/VideoPlayer"
+import { Session } from "next-auth"
 
-export default function ReactionDetails({ reaction, relatedContent }: ReactionDetailsProps) {
+export default function ReactionDetails({ reaction, relatedContent, session }: 
+                                        { reaction: ReactionParams; 
+                                          relatedContent: ReactionDetailsProps["relatedContent"]; 
+                                          session: Session }) {
   const [activeVideo, setActiveVideo] = useState<string | null>(null)
   const [expandedDescription, setExpandedDescription] = useState(false)
 
@@ -46,7 +50,7 @@ export default function ReactionDetails({ reaction, relatedContent }: ReactionDe
       return {
         type: "episode",
         title: relatedContent.episode.title || "",
-        link: `/series/${reaction.series_id}/season/${reaction.season_number}/episode/${relatedContent.episode.episode_number}`,
+        link: `/series/${reaction}/season/${reaction.season_number}/episode/${relatedContent.episode.episode_number}`,
         fullTitle: `${relatedContent.series?.title} - S${reaction.season_number}E${relatedContent.episode.episode_number} - ${relatedContent.episode.title}`,
       }
     }
@@ -82,7 +86,9 @@ export default function ReactionDetails({ reaction, relatedContent }: ReactionDe
           <div className="max-w-6xl mx-auto">
             <VideoPlayer
               src={activeVideo}
-              poster={reaction.thumbnail || "/placeholder.svg?height=720&width=1280"}
+              poster={reaction.thumbnail || "/placeholder.svg?height=720&width=1280"} 
+              reactionId={reaction.id}
+              session={session}
             />
           </div>
 
@@ -95,7 +101,9 @@ export default function ReactionDetails({ reaction, relatedContent }: ReactionDe
             <h1 className="text-3xl md:text-4xl font-bold mb-2">{reaction.title}</h1>
               <h2 className="text-xl text-gray-400 mb-4 hover:underline hover:text-white">
               <Link href={`/series/${relatedContent.series?.id}/season/${reaction.season_number}/episode/${relatedContent.episode?.episode_number}`}>
-                {reaction.episode} : {relatedContent.episode?.title}
+                <span className="text-white">
+                  {relatedContent.series?.title} : {relatedContent.episode?.title}
+                </span>
                 </Link>
               </h2>
                   {/* Description */}
