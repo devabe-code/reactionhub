@@ -94,9 +94,9 @@ export default function Header() {
             <Link href={`/anime/${animeIDs[3].id}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               Death Note
             </Link>
-            <Link href="/list" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+            {/*<Link href="/list" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               My List
-            </Link>
+            </Link>*/}
           </nav>
         </div>
 

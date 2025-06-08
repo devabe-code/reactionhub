@@ -27,21 +27,21 @@ const navItems = [
     url: "/tv-shows",
     icon: Tv2
   },
-  {
+  /*{
     title: "My List",
     url: "/my-list",
     icon: Star,
-  },
+  },*/
   {
     title: "History",
     url: "/history",
     icon: HistoryIcon,
   },
-  {
+  /*{
     title: "Settings",
     url: "/settings",
     icon: Settings2,
-  },
+  },*/
 ]
 
 export default function AppSidebar({

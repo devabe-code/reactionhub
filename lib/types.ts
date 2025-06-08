@@ -332,6 +332,8 @@ export interface RelatedContent {
   episode?: Episode;
   season?: Season;
   otherReactions?: Reaction[];
+  nextEpisode?: Episode;
+  prevEpisode?: Episode;
 }
 
 // Component props interfaces
@@ -339,6 +341,7 @@ export interface ContentDetailsProps {
   type: ContentType;
   content: BaseContent;
   relatedContent: RelatedContent;
+  session: Session;
 }
 
 export interface ContentHeroProps {

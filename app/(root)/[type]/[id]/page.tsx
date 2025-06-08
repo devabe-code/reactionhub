@@ -5,6 +5,8 @@ import * as schema from "@/database/schema"
 import { eq, and, asc } from "drizzle-orm"
 import ContentDetails from "@/components/content/ContentDetails"
 import { ContentType } from "@/lib/types"
+import { auth } from "@/auth"
+import { Session } from "next-auth"
 
 type ContentParams = {
   params: {
@@ -15,6 +17,7 @@ type ContentParams = {
 
 export default async function ContentPage({ params }: ContentParams) {
   const { type, id } = await params
+  const session = await auth() || {} as Session
 
   if (!["movie", "series", "anime", "season", "episode"].includes(type)) {
     notFound()
@@ -306,7 +309,7 @@ export default async function ContentPage({ params }: ContentParams) {
       notFound()
     }
 
-    return <ContentDetails type={type as ContentType} content={content} relatedContent={relatedContent} />
+    return <ContentDetails type={type as ContentType} content={content} relatedContent={relatedContent} session={session} />
   } catch (error) {
     console.error("Error fetching content:", error)
     notFound()

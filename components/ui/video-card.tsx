@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { formatDate } from "@/lib/utils"
-import { Session } from "next-auth"
 
 export interface VideoCardProps {
   id: string
@@ -32,7 +31,6 @@ export interface VideoCardProps {
   customPrimaryButtonIcon?: React.ReactNode
   progress?: number
   duration?: number
-  session?: Session
 }
 
 export function VideoCard({
@@ -56,8 +54,7 @@ export function VideoCard({
   customPrimaryButtonText,
   customPrimaryButtonIcon,
   progress,
-  duration,
-  session
+  duration
 }: VideoCardProps) {
   const progressPercentage = duration && progress 
     ? Math.min(Math.round((progress / duration) * 100), 100)
@@ -193,20 +190,11 @@ export function VideoCard({
         {showButtons && (
           <div className="flex flex-wrap gap-2">
             <Link href={primaryLink}>
-              <Button size="sm" className="gap-1 bg-red-600 hover:bg-red-700">
+              <Button size="sm" className="gap-1 bg-red-600 hover:bg-red-700 text-white">
                 {getPrimaryButtonIcon()}
                 {getPrimaryButtonText()}
               </Button>
             </Link>
-
-            {externalLink && (
-              <Link href={externalLink} target="_blank" rel="noopener noreferrer">
-                <Button size="sm" variant="outline" className="gap-1">
-                  <ExternalLink size={14} />
-                  {externalLinkLabel}
-                </Button>
-              </Link>
-            )}
           </div>
         )}
       </div>

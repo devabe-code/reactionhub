@@ -263,16 +263,35 @@ export default function ContentDetails({ type, content, relatedContent, session 
                             showButtons={true}
                             progress={reaction.progress}
                             duration={reaction.duration}
-                            session={session}
-                          >
-
-                          </VideoCard>
+                          />
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
               </div>
+
+              {/* Add navigation for previous/next episode if type is 'episode' */}
+              {type === "episode" && (
+                <div className="flex gap-4 mt-6 px-6 pb-6">
+                  {relatedContent.prevEpisode && (
+                    <Link
+                      href={`/series/${relatedContent.series?.id}/season/${relatedContent.season?.season_number}/episode/${relatedContent.prevEpisode.episode_number}`}
+                      className="text-blue-400 hover:underline"
+                    >
+                      ← Previous: {relatedContent.prevEpisode.title}
+                    </Link>
+                  )}
+                  {relatedContent.nextEpisode && (
+                    <Link
+                      href={`/series/${relatedContent.series?.id}/season/${relatedContent.season?.season_number}/episode/${relatedContent.nextEpisode.episode_number}`}
+                      className="text-blue-400 hover:underline"
+                    >
+                      Next: {relatedContent.nextEpisode.title} →
+                    </Link>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
             {/* Seasons Tab */}
