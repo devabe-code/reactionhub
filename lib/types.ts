@@ -239,24 +239,26 @@ export type ContentType = "movie" | "series" | "anime" | "season" | "episode";
 
 // Base content interface with common properties
 export interface BaseContent {
-  runtime?: number; // Changed from boolean to optional number
-  number_of_seasons: number | null;
-  number_of_episodes: number | null;
-  id: string;
-  title?: string;
-  name?: string;
-  description: string | null;
-  overview?: string;
-  poster_path?: string | null;
-  backdrop_path?: string | null;
-  original_title?: string | null;
-  genres?: string[] | null[];
-  language?: string | null;
-  production_companies?: string[] | unknown;
-  coverColor: string;
-  tmdb_id?: number | null;
-  mal_id?: number;
-  is_anime?: boolean | null;
+  id: string
+  title: string
+  image?: string
+  release_date?: string | Date
+  first_air_date?: string | Date | null
+  last_air_date?: string | Date | null
+  air_date?: string | Date
+  runtime?: number
+  language?: string
+  budget?: number
+  revenue?: number
+  production_companies?: string | string[]
+  still_path?: string | null
+  poster_path?: string | null
+  backdrop_path?: string | null
+  overview?: string
+  season_number?: number
+  episode_number?: number
+  number_of_seasons?: number | null
+  number_of_episodes?: number | null
 }
 
 // Movie specific properties
@@ -342,6 +344,7 @@ export interface ContentDetailsProps {
   content: BaseContent;
   relatedContent: RelatedContent;
   session: Session;
+  isLoading?: boolean;
 }
 
 export interface ContentHeroProps {
@@ -349,31 +352,34 @@ export interface ContentHeroProps {
   content: BaseContent;
   hasReactions: boolean;
   relatedContent: RelatedContent;
+  isLoading?: boolean;
 }
 
 export interface ContentMetadataProps {
-  type: ContentType;
-  content: BaseContent;
-  relatedContent: RelatedContent;
+  type: ContentType
+  content: BaseContent
+  relatedContent: RelatedContent
+  isLoading?: boolean
 }
 
 export interface SeasonListProps {
-  series: Series;
-  seasons: Season[];
-  reactions: Reaction[];
+  series: Series
+  seasons: Season[]
+  reactions: Reaction[]
+  isLoading?: boolean
 }
 
 export interface EpisodeListProps {
-  series: Series;
-  episodes: Episode[];
-  seasons: Season[];
-  reactions: Reaction[];
+  series: Series
+  episodes: Episode[]
+  seasons: Season[]
+  reactions: Reaction[]
+  isLoading?: boolean
 }
 
 export interface ReactionListProps {
-  reactions: Reaction[];
-  contentType: ContentType;
-  content: BaseContent;
+  reactions: Reaction[]
+  isLoading?: boolean
 }
 
 export interface ReactionDetailsProps {

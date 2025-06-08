@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { formatDate } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export interface VideoCardProps {
   id: string
@@ -31,6 +32,7 @@ export interface VideoCardProps {
   customPrimaryButtonIcon?: React.ReactNode
   progress?: number
   duration?: number
+  isLoading?: boolean
 }
 
 export function VideoCard({
@@ -54,7 +56,8 @@ export function VideoCard({
   customPrimaryButtonText,
   customPrimaryButtonIcon,
   progress,
-  duration
+  duration,
+  isLoading = false
 }: VideoCardProps) {
   const progressPercentage = duration && progress 
     ? Math.min(Math.round((progress / duration) * 100), 100)
@@ -133,6 +136,32 @@ export function VideoCard({
       default:
         return ""
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className={cn(
+        "bg-gray-900/30 border border-gray-800 rounded-lg overflow-hidden",
+        getSizeClasses(),
+        className
+      )}>
+        <div className={cn("relative", aspectRatioClass)}>
+          <Skeleton className="w-full h-full" />
+        </div>
+        <div className="p-4">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2 mb-4" />
+          {showDate && (
+            <Skeleton className="h-4 w-1/4 mb-4" />
+          )}
+          {showButtons && (
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-24" />
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (

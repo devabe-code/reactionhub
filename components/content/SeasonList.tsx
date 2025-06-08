@@ -8,10 +8,18 @@ import { Badge } from "@/components/ui/badge"
 import { cn, formatDate } from "@/lib/utils"
 import { FaYoutube } from "react-icons/fa6"
 import type { SeasonListProps } from "@/lib/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const TMDB_URL = "https://image.tmdb.org/t/p/w300"
 
-export default function SeasonList({ series, seasons, reactions }: SeasonListProps) {
+export interface SeasonListProps {
+  series: any
+  seasons: any[]
+  reactions: any[]
+  isLoading?: boolean
+}
+
+export default function SeasonList({ series, seasons, reactions, isLoading = false }: SeasonListProps) {
   console.log(series)
   console.log("seasons")
   const [expandedSeason, setExpandedSeason] = useState<string | null>(null)
@@ -24,6 +32,34 @@ export default function SeasonList({ series, seasons, reactions }: SeasonListPro
   // Get reaction count for a season
   const getSeasonReactionCount = (seasonId: string) => {
     return reactions.filter((reaction) => reaction.season_id === seasonId).length
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        <Skeleton className="h-8 w-32 mb-6" />
+
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="border border-gray-800 rounded-lg overflow-hidden bg-gray-900/20">
+              <div className="flex items-center p-4">
+                <Skeleton className="h-16 w-12 rounded flex-shrink-0" />
+                <div className="ml-4 flex-1">
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-6 w-32" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-4 w-24 mt-2" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (

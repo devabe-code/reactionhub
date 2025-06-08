@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, Globe, Users, TrendingUp, Award } from "lucide-react"
 import type { ContentMetadataProps } from "@/lib/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // Helper function to parse JSON if needed
 const parseJsonField = (field: string) => {
@@ -24,7 +25,14 @@ const formatDate = (dateString?: string) => {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
 }
 
-export default function ContentMetadata({ type, content, relatedContent }: ContentMetadataProps) {
+export interface ContentMetadataProps {
+  type: ContentType
+  content: BaseContent
+  relatedContent: RelatedContent
+  isLoading?: boolean
+}
+
+export default function ContentMetadata({ type, content, relatedContent, isLoading = false }: ContentMetadataProps) {
   // Determine which metadata to show based on content type
   const getMetadataItems = () => {
     const items = []
@@ -151,6 +159,41 @@ export default function ContentMetadata({ type, content, relatedContent }: Conte
 
   // Production Companies
   const productionCompanies = parseJsonField(content.production_companies)
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <Skeleton className="h-5 w-5" />
+              <div>
+                <Skeleton className="h-4 w-24 mb-1" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <Skeleton className="h-5 w-24 mb-2" />
+          <div className="space-y-1">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-5 w-40" />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Skeleton className="h-5 w-24 mb-2" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-6 w-8" />
+            <Skeleton className="h-5 w-32" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

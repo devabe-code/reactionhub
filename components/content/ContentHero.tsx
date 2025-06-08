@@ -9,10 +9,19 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { FaYoutube } from "react-icons/fa6"
 import type { ContentHeroProps } from "@/lib/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const TMDB_URL = "https://image.tmdb.org/t/p/original"
 
-export default function ContentHero({ type, content, hasReactions, relatedContent }: ContentHeroProps) {
+export interface ContentHeroProps {
+  type: ContentType
+  content: BaseContent
+  hasReactions: boolean
+  relatedContent: RelatedContent
+  isLoading?: boolean
+}
+
+export default function ContentHero({ type, content, hasReactions, relatedContent, isLoading = false }: ContentHeroProps) {
   const [isMobile, setIsMobile] = useState(false)
 
   // Check if we're on mobile
@@ -91,6 +100,29 @@ export default function ContentHero({ type, content, hasReactions, relatedConten
     }
 
     return ""
+  }
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[70vh] overflow-hidden">
+        <Skeleton className="w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" />
+        
+        {/* Content */}
+        <div className="relative z-20 h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <Skeleton className="h-12 w-3/4 mb-4" />
+            <Skeleton className="h-6 w-1/2 mb-6" />
+            <div className="flex gap-4">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

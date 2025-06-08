@@ -18,6 +18,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import Autoplay, { type AutoplayType } from "embla-carousel-autoplay"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // Define base content interface with required fields
 export interface BaseContent {
@@ -47,6 +48,7 @@ export interface HeroSectionProps {
   upcomingContent?: BaseContent[]
   title?: string
   className?: string
+  isLoading?: boolean
 }
 
 const TMDB_URL = "https://image.tmdb.org/t/p/original"
@@ -204,7 +206,9 @@ const HeroSlide = ({ content }: { content: FeaturedContent }) => {
 
 export default function HeroSection({
   featuredContent = [],
+  upcomingContent = [],
   className,
+  isLoading = false,
 }: HeroSectionProps) {
   // Create a ref for the autoplay plugin first, before any conditionals
   const plugin = useRef<AutoplayType>(
@@ -218,6 +222,29 @@ export default function HeroSection({
   // Handle empty content
   if (featuredContent.length === 0) {
     return null
+  }
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[90vh] overflow-hidden">
+        <div className="absolute inset-0 bg-gray-900" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-60 bg-gradient-to-t from-black via-black/100 to-transparent" />
+        
+        {/* Content */}
+        <div className="relative z-20 h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <Skeleton className="h-12 w-3/4 mb-4" />
+            <Skeleton className="h-6 w-1/2 mb-6" />
+            <div className="flex gap-4">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

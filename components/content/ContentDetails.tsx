@@ -17,15 +17,19 @@ import ContentMetadata from "./ContentMetadata"
 import type { BaseContent, ContentDetailsProps, ContentType, RelatedContent, Series } from "@/lib/types"
 import { VideoCard } from "../ui/video-card"
 import { Session } from "next-auth"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const TMDB_URL = "https://image.tmdb.org/t/p/original"
 
-export default function ContentDetails({ type, content, relatedContent, session }: 
-                                        { type: ContentType; 
-                                          content: BaseContent; 
-                                          relatedContent: RelatedContent; 
-                                          session: Session }
-) {
+export interface ContentDetailsProps {
+  type: ContentType
+  content: BaseContent
+  relatedContent: RelatedContent
+  session: Session
+  isLoading?: boolean
+}
+
+export default function ContentDetails({ type, content, relatedContent, session, isLoading = false }: ContentDetailsProps) {
   const [activeTab, setActiveTab] = useState("overview")
   const [expandedDescription, setExpandedDescription] = useState(false)
 
@@ -59,6 +63,56 @@ export default function ContentDetails({ type, content, relatedContent, session 
   }
   if (type === "anime" && relatedContent.animeData) {
     availableTabs.push("anime-details")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <ContentHero type={type} content={content} hasReactions={false} relatedContent={relatedContent} isLoading={true} />
+
+        <div className="container mx-auto px-4 py-8 -mt-10 relative z-10">
+          <div className="bg-black/80 backdrop-blur-md rounded-xl border border-gray-800">
+            <div className="border-b border-gray-800 px-4">
+              <div className="flex gap-4 h-14">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Left Column */}
+                <div className="md:col-span-1">
+                  <Skeleton className="aspect-[2/3] rounded-lg mb-6" />
+                  <div className="space-y-4">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="md:col-span-2">
+                  <Skeleton className="h-10 w-3/4 mb-4" />
+                  <Skeleton className="h-6 w-1/2 mb-6" />
+                  <div className="flex gap-2 mb-6">
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-20" />
+                  </div>
+                  <Skeleton className="h-32 w-full mb-8" />
+                  <div className="flex gap-4">
+                    <Skeleton className="h-10 w-32" />
+                    <Skeleton className="h-10 w-32" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -173,11 +227,20 @@ export default function ContentDetails({ type, content, relatedContent, session 
 
                   {/* Genres */}
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {content.genres && content.genres.map((genre, i) => (
-                        <Badge key={i} variant="outline" className="border-gray-700 text-gray-300">
-                          <span>{genre}</span>
-                        </Badge>
-                      ))}
+                      {content.genres && content.genres.map((genre, i) => {
+                        if (!genre) return null;
+                        const genreName = typeof genre === 'string' 
+                          ? genre 
+                          : typeof genre === 'object' && genre !== null && 'name' in genre 
+                            ? (genre as { name: string }).name 
+                            : '';
+                        if (!genreName) return null;
+                        return (
+                          <Badge key={i} variant="outline" className="border-gray-700 text-gray-300">
+                            <span>{genreName}</span>
+                          </Badge>
+                        );
+                      })}
                     </div>
 
                   {/* Description */}

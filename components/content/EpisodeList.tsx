@@ -9,10 +9,19 @@ import { Button } from "@/components/ui/button"
 import { cn, formatDate } from "@/lib/utils"
 import { FaYoutube } from "react-icons/fa6"
 import type { EpisodeListProps } from "@/lib/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const TMDB_URL = "https://image.tmdb.org/t/p/w300"
 
-export default function EpisodeList({ series, episodes, seasons, reactions }: EpisodeListProps) {
+export interface EpisodeListProps {
+  series: any
+  episodes: any[]
+  seasons: any[]
+  reactions: any[]
+  isLoading?: boolean
+}
+
+export default function EpisodeList({ series, episodes, seasons, reactions, isLoading = false }: EpisodeListProps) {
   const [activeSeason, setActiveSeason] = useState(seasons.length > 0 ? seasons[0].season_number : 1)
   const [expandedEpisode, setExpandedEpisode] = useState<string | null>(null)
 
@@ -33,6 +42,49 @@ export default function EpisodeList({ series, episodes, seasons, reactions }: Ep
   // Get reactions for an episode
   const getEpisodeReactions = (episodeId: string) => {
     return reactions.filter((reaction) => reaction.episode_id === episodeId)
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        {/* Season Selector Skeleton */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-0 items-center justify-between mb-2">
+            <Skeleton className="h-8 w-32" />
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-16" />
+                <Skeleton className="h-8 w-32" />
+              </div>
+            </div>
+          </div>
+          <div className="h-px bg-gray-800 w-full mb-4"></div>
+        </div>
+
+        {/* Episodes List Skeleton */}
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="border border-gray-800 rounded-lg overflow-hidden bg-gray-900/20">
+              <div className="flex flex-col sm:flex-row sm:items-center p-4">
+                <Skeleton className="h-32 sm:h-24 sm:w-40 rounded flex-shrink-0 mb-3 sm:mb-0" />
+                <div className="sm:ml-4 flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <Skeleton className="h-6 w-48 mb-2" />
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-6 w-6" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (

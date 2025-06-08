@@ -8,6 +8,7 @@ import { get_reaction } from "@/lib/actions/reactions"
 import type { BaseContent } from "@/components/HeroSection"
 import type { ReactionParams } from "@/lib/types"
 import { VideoCard } from "@/components/ui/video-card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export interface CarouselItemProps extends BaseContent {
   id: string;
@@ -27,9 +28,10 @@ interface MovieCarouselProps {
   items?: CarouselItemProps[]
   className?: string
   title?: string
+  isLoading?: boolean
 }
 
-export default function MovieCarousel({ items = [], className, title }: MovieCarouselProps) {
+export default function MovieCarousel({ items = [], className, title, isLoading = false }: MovieCarouselProps) {
   const [carouselData, setCarouselData] = useState<(ReactionParams | null)[]>([])
   const [api, setApi] = useState<CarouselApi>()
   const [canScrollPrev, setCanScrollPrev] = useState(false)
@@ -77,6 +79,34 @@ export default function MovieCarousel({ items = [], className, title }: MovieCar
       fetchReactions()
     }
   }, [items])
+
+  if (isLoading) {
+    return (
+      <div className={cn("relative", className)}>
+        {title && (
+          <div className="flex items-center justify-between mb-4">
+            <Skeleton className="h-8 w-48" />
+          </div>
+        )}
+        <div className="relative">
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex-none w-[320px] sm:w-[360px] md:w-[400px]">
+                <VideoCard
+                  id=""
+                  title=""
+                  thumbnail=""
+                  primaryLink=""
+                  isLoading={true}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+        </div>
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return null

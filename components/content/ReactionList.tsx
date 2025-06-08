@@ -7,6 +7,7 @@ import { ContentGrid } from "@/components/ui/content-grid"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useSearch } from "@/hooks/use-search"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import {
   Pagination,
@@ -18,7 +19,12 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
-export default function ReactionList({ reactions }: ReactionListProps) {
+export interface ReactionListProps {
+  reactions: any[]
+  isLoading?: boolean
+}
+
+export default function ReactionList({ reactions, isLoading = false }: ReactionListProps) {
   const itemsPerPage = 9
 
   // Use our search hook
@@ -46,6 +52,30 @@ export default function ReactionList({ reactions }: ReactionListProps) {
       setPage(newPage)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-10 w-64 sm:w-72" />
+        </div>
+
+        <ContentGrid>
+          {[...Array(9)].map((_, i) => (
+            <VideoCard
+              key={i}
+              id=""
+              title=""
+              thumbnail=""
+              primaryLink=""
+              isLoading={true}
+            />
+          ))}
+        </ContentGrid>
+      </div>
+    )
   }
 
   return (
