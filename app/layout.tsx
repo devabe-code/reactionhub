@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ReactionHub",
   description: "Movie, TV Show and Anime Reactions and Reviews from KrowTV!",
+  other: {
+    "google-adsense-account": process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID ?? "",
+  },
 };
 
 export default function RootLayout({
